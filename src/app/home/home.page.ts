@@ -4,7 +4,9 @@ import { AlertController } from '@ionic/angular';
 import { File } from '@ionic-native/file/ngx';
 import { ActionSheetController } from '@ionic/angular';
 import * as $ from 'jquery';
-import { FileWriterService } from '../providers/file-writer.service';
+
+declare let window: any;
+declare let cordova: any;
 
 @Component({
   selector: 'app-home',
@@ -39,7 +41,6 @@ export class HomePage {
     private camera: Camera,
     public actionSheetController: ActionSheetController,
     private file: File,
-    private fileWriter: FileWriterService,
     private alertCtrl: AlertController
   ) {
     this.panelID = Math.random().toString(36).substring(2);
@@ -60,7 +61,7 @@ export class HomePage {
     const onSuccess = async (imageB64) => {
       try {
         const imgName = new Date().getTime() + '.jpg';
-        const imagePath = await this.fileWriter.Base64ToFile(
+        const imagePath = await this.Base64ToFile(
           imgName,
           imageB64,
           this.pixDirectory
@@ -102,11 +103,62 @@ export class HomePage {
     );
   }
 
+  // Method I used to convert base64 data to blob data
+  b64toBlob(b64Data: string, contentType: string, sliceSize: number) {
+    contentType = contentType || '';
+    sliceSize = sliceSize || 512;
+
+    const byteCharacters = atob(b64Data);
+    const byteArrays = [];
+
+    for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+      const slice = byteCharacters.slice(offset, offset + sliceSize);
+
+      const byteNumbers = new Array(slice.length);
+      for (let i = 0; i < slice.length; i++) {
+        byteNumbers[i] = slice.charCodeAt(i);
+      }
+
+      const byteArray = new Uint8Array(byteNumbers);
+
+      byteArrays.push(byteArray);
+    }
+
+    const blob = new Blob(byteArrays, { type: contentType });
+    return blob;
+  }
+
   // here is the method is used to write a file in storage
+  Base64ToFile(imgName, b64Str, pixDir): Promise<any> {
+    const self = this;
+    const dataBlob = this.b64toBlob(b64Str, null, null);
 
-  // here is the method is used to get content type of an bas64 data
+    return new Promise((resolve, reject) => {
+      window.resolveLocalFileSystemURL(
+        cordova.file.dataDirectory,
+        (fileSys) => {
+          fileSys.filesystem.root.getDirectory(
+            pixDir,
+            { create: true },
+            (directory) => {
+              directory.getFile(imgName, { create: true }, (file) => {
+                file.createWriter((fileWriter) => {
+                  fileWriter.onwrite = () => {
+                    resolve(file.toInternalURL());
+                  };
 
-  // here is the method I used to convert base64 data to blob data
+                  fileWriter.onerror = reject;
+                  fileWriter.write(dataBlob);
+                }, reject);
+              });
+            },
+            reject
+          );
+        },
+        reject
+      );
+    });
+  }
 
   public showErrorMessage(Error: string): void {
     console.log(Error);
