@@ -1,5 +1,5 @@
 {
-  "name": "imagecropper",
+  "name": "Camera component",
   "integrations": {
     "cordova": {}
   },
