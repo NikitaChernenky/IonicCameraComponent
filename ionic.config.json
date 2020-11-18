@@ -1,5 +1,7 @@
 {
   "name": "imagecropper",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "angular"
 }
