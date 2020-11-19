@@ -16,18 +16,16 @@ export class HomePage {
 
   maxNumberOfImages = 10;
   itemLabel = 'Images';
-  required = false;
+  required = true;
   saveCopyToGallery = false;
   srcList: { imgPath: string; base64: string }[] = [];
- // @Input() saveLocation = '';
+  picturesDirectory = 'justPhotos';
 
 
   private panelExpand = false;
   private iconClicked = false;
   private panelID: string;
 
-
-  public pixDirectory = 'AppPhotos';
 
   croppedImagepath = '';
   isLoading = false;

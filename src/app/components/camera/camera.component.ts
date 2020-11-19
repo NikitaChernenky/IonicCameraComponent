@@ -20,15 +20,13 @@ export class CameraComponent implements OnInit {
   @Input() required = false;
   @Input() saveCopyToGallery = false;
   @Input() srcList: { imgPath: string; base64: string }[] = [];
+  @Input() picturesDirectory = 'AppPhotos';
  // @Input() saveLocation = '';
 
 
   private panelExpand = false;
   private iconClicked = false;
   private panelID: string;
-
-
-  public pixDirectory = 'AppPhotos';
 
   croppedImagepath = '';
   isLoading = false;
@@ -68,12 +66,12 @@ export class CameraComponent implements OnInit {
         const imagePath = await this.Base64ToFile(
           imgName,
           imageB64,
-          this.pixDirectory
+          this.picturesDirectory
         );
         const base64Image = 'data:image/jpeg;base64,' + imageB64;
         const imgRes = { imgPath: imagePath, base64: base64Image };
         this.srcList.push(imgRes);
-        //console.log(this.srcList);
+        console.log(this.srcList);
       } catch (ex) {
         console.log(ex);
         this.showErrorMessage(ex);
@@ -138,7 +136,7 @@ export class CameraComponent implements OnInit {
     const dataBlob = this.b64toBlob(b64Str, null, null);
 
     return new Promise((resolve, reject) => {
-      let path = cordova.file.dataDirectory;
+      const path = cordova.file.dataDirectory;
       window.resolveLocalFileSystemURL(
         path,
         (fileSys) => {
