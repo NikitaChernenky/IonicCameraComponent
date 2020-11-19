@@ -24,3 +24,8 @@
 @import "~@ionic/angular/css/text-alignment.css";
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
+
+.hideTitle-alert .alert-head {display:none;}
+.disableBottomBorder .item-inner {border-bottom: 0 !important;}
+.hideTitle-alert .alert-message:empty { padding: 0 0 0px !important;}
+.iconButtonStandardWidth {width:10%;}

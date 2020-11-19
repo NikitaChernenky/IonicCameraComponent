@@ -1,0 +1,64 @@
+
+  <ion-item lines="none" mode="ios" class="buttons">
+    <ion-buttons slot="start">
+      <ion-button
+        fill="clear"
+        class="orangeButtons"
+        (click)="pickImage(this.camera.PictureSourceType.CAMERA)"
+      >
+        <ion-icon class="ButtonIcon" name="camera"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-buttons slot="end">
+      <ion-button
+        fill="clear"
+        class="orangeButtons"
+        (click)="this.pickImage(this.camera.PictureSourceType.PHOTOLIBRARY)"
+      >
+        <ion-icon class="ButtonIcon Right" name="folder"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-item>
+
+  <ion-item 
+    lines="none"
+    (click)="onClickItem()"
+    class="two disableBottomBorder underlined"
+    tappable
+  >
+    <ion-icon
+      slot="start"
+      class="expand"
+      name="{{panelExpand ? 'caret-up-circle-outline' : 'caret-down-outline'}}"
+      style="margin-right: 3px"
+    ></ion-icon>
+    <label class="title"
+      ><span *ngIf="required" class="requiredIndicator">* </span
+      ><b>{{itemLabel}}</b></label
+    >
+    <label slot="end" class="image-label"
+      >&nbsp;&nbsp;{{srcList.length}}/{{maxNumberOfImages}}&nbsp;&nbsp;&nbsp;</label
+    >
+  </ion-item>
+  <div
+    id="picture-Panel-{{ panelID }}"
+    class="underlined"
+    style="display: none; text-align: center"
+  >
+    <ion-grid>
+      <ion-row no-padding>
+        <ion-col *ngFor="let photo of srcList; let i = index">
+          <ion-card class="block">
+            <ion-icon
+              name="trash"
+              class="deleteIcon"
+              (click)="deletePhoto(i)"
+            ></ion-icon>
+            <img class="image" [src]="photo.base64" *ngIf="photo.base64" />
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+
