@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModalController, LoadingController } from '@ionic/angular';
+import { BASE64 } from '../base64';
 
 declare let window: any;
 declare let cordova: any;
@@ -10,7 +11,7 @@ declare let cordova: any;
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
-export class HomePage {
+export class HomePage implements OnInit{
   typeModal: HTMLIonModalElement;
 
   @Input() imagePaths: string[] = [];
@@ -37,6 +38,10 @@ export class HomePage {
     public router: Router,
     public modalController: ModalController
   ) {}
+  ngOnInit(): void {
+     // this.srcList.push({imgPath : '/assets/img/test.jpg', base64 : 'data:image/jpeg;base64,' + BASE64.BASE64_IMAGE});
+     this.srcList.push({imgPath : '/assets/img/test.jpg', base64 : 'data:image/jpeg;base64,' + BASE64.BASE64_IMAGE});
+  }
 
   printImagePaths(imagePaths: string[]) {
     if (imagePaths) {

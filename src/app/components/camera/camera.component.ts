@@ -1,4 +1,4 @@
-import { Component, Output, Input, OnInit, EventEmitter} from '@angular/core';
+import { Component, Output, Input, EventEmitter, AfterViewInit} from '@angular/core';
 import { Camera, CameraOptions } from '@ionic-native/Camera/ngx';
 import { AlertController } from '@ionic/angular';
 import { File } from '@ionic-native/file/ngx';
@@ -13,7 +13,7 @@ declare let cordova: any;
   templateUrl: './camera.component.html',
   styleUrls: ['./camera.component.scss'],
 })
-export class CameraComponent implements OnInit {
+export class CameraComponent implements AfterViewInit {
 
   @Input() maxNumberOfImages = 10;
   @Input() itemLabel = 'Images';
@@ -30,17 +30,6 @@ export class CameraComponent implements OnInit {
 
   imagePaths: string[] = [];
 
-  croppedImagepath = '';
-  isLoading = false;
-
-  image = '';
-  base64Image = '';
-
-  imagePickerOptions = {
-    maximumImagesCount: 1,
-    quality: 50,
-  };
-
   constructor(
     private camera: Camera,
     public actionSheetController: ActionSheetController,
@@ -48,6 +37,13 @@ export class CameraComponent implements OnInit {
     private alertCtrl: AlertController
   ) {
     this.panelID = Math.random().toString(36).substring(2);
+  }
+
+  ngAfterViewInit() {
+    if (this.srcList.length > 0) {
+      console.log('srcList loaded successfully');
+      this.togglePanel();
+    }
   }
 
   pickImage(sourceType) {
@@ -190,11 +186,6 @@ export class CameraComponent implements OnInit {
   deletePhoto(index) {
     this.srcList.splice(index, 1);
     this.updateImagePath();
-  }
-
-
-
-  ngOnInit() {
   }
 
   updateImagePath() {
