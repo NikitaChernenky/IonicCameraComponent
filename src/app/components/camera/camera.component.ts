@@ -1,4 +1,4 @@
-import { Component, Output, Input, OnInit} from '@angular/core';
+import { Component, Output, Input, OnInit, EventEmitter} from '@angular/core';
 import { Camera, CameraOptions } from '@ionic-native/Camera/ngx';
 import { AlertController } from '@ionic/angular';
 import { File } from '@ionic-native/file/ngx';
@@ -23,10 +23,14 @@ export class CameraComponent implements OnInit {
   @Input() picturesDirectory = 'AppPhotos';
  // @Input() saveLocation = '';
 
+  // @Output() PictureAddedEvent: EventEmitter<string> = new EventEmitter();
+  @Output() emitImagePathsChange: EventEmitter<string[]> = new EventEmitter<string[]>();
 
   private panelExpand = false;
   private iconClicked = false;
   private panelID: string;
+
+  imagePaths: string[] = [];
 
   croppedImagepath = '';
   isLoading = false;
@@ -71,7 +75,8 @@ export class CameraComponent implements OnInit {
         const base64Image = 'data:image/jpeg;base64,' + imageB64;
         const imgRes = { imgPath: imagePath, base64: base64Image };
         this.srcList.push(imgRes);
-        console.log(this.srcList);
+        this.updateImagePath();
+        // console.log(this.srcList);
       } catch (ex) {
         console.log(ex);
         this.showErrorMessage(ex);
@@ -99,8 +104,7 @@ export class CameraComponent implements OnInit {
         }
       },
       (err) => {
-        console.log(`ERR -> ${JSON.stringify(err)}`);
-        // Handle error
+        console.log(`ERR -> ${JSON.stringify(err)}`);  // Error handling
       }
     );
   }
@@ -187,9 +191,24 @@ export class CameraComponent implements OnInit {
 
   deletePhoto(index) {
     this.srcList.splice(index, 1);
+    this.updateImagePath();
   }
 
 
-  ngOnInit() {}
+
+  ngOnInit() {
+  }
+
+  updateImagePath() {
+    this.imagePaths = []; // reset array
+    for (let i = 0; i < this.srcList.length; i++) {
+      this.imagePaths[i] = this.srcList[i].imgPath.toString();
+    }
+    this.emitImagePaths(this.imagePaths);
+  }
+
+  emitImagePaths(imagePaths: string[]) {
+    this.emitImagePathsChange.emit(imagePaths);
+  }
 
 }

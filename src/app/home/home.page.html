@@ -14,11 +14,12 @@
       <ion-item-group>
         <ion-item class="ion-no-padding" style="--inner-padding-end: 0;">
           <app-camera 
+            (emitImagePathsChange)="printImagePaths($event)"
             [maxNumberOfImages]="maxNumberOfImages"
             [itemLabel]="itemLabel"
             [required]="required"
             [saveCopyToGallery]="saveCopyToGallery"
-            [srcList]="srcList"
+            [(srcList)]="srcList"
             [picturesDirectory]="picturesDirectory"
             style="width: 100%"
           ></app-camera>

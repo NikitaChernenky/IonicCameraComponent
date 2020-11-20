@@ -1,7 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModalController, LoadingController } from '@ionic/angular';
-
 
 declare let window: any;
 declare let cordova: any;
@@ -14,6 +13,8 @@ declare let cordova: any;
 export class HomePage {
   typeModal: HTMLIonModalElement;
 
+  @Input() imagePaths: string[] = [];
+
   maxNumberOfImages = 10;
   itemLabel = 'Images';
   required = true;
@@ -21,11 +22,9 @@ export class HomePage {
   srcList: { imgPath: string; base64: string }[] = [];
   picturesDirectory = 'justPhotos';
 
-
   private panelExpand = false;
   private iconClicked = false;
   private panelID: string;
-
 
   croppedImagepath = '';
   isLoading = false;
@@ -36,8 +35,14 @@ export class HomePage {
   constructor(
     public loadingCtrl: LoadingController,
     public router: Router,
-    public modalController: ModalController,
-  ) {
-  }
+    public modalController: ModalController
+  ) {}
 
+  printImagePaths(imagePaths: string[]) {
+    if (imagePaths) {
+      for (const val of imagePaths) {
+        console.log(val);
+      }
+    }
+  }
 }
