@@ -12,7 +12,7 @@ declare let cordova: any;
   styleUrls: ['home.page.scss'],
 })
 export class HomePage implements OnInit{
-  typeModal: HTMLIonModalElement;
+  //typeModal: HTMLIonModalElement;
 
   @Input() imagePaths: string[] = [];
 
@@ -22,10 +22,6 @@ export class HomePage implements OnInit{
   saveCopyToGallery = false;
   srcList: { imgPath: string; base64: string }[] = [];
   picturesDirectory = 'justPhotos';
-
-  private panelExpand = false;
-  private iconClicked = false;
-  private panelID: string;
 
   croppedImagepath = '';
   isLoading = false;
@@ -40,7 +36,7 @@ export class HomePage implements OnInit{
   ) {}
   ngOnInit(): void {
      // this.srcList.push({imgPath : '/assets/img/test.jpg', base64 : 'data:image/jpeg;base64,' + BASE64.BASE64_IMAGE});
-     this.srcList.push({imgPath : '/assets/img/test.jpg', base64 : 'data:image/jpeg;base64,' + BASE64.BASE64_IMAGE});
+     // this.srcList.push({imgPath : '/assets/img/test.jpg', base64 : 'data:image/jpeg;base64,' + BASE64.BASE64_IMAGE});
   }
 
   printImagePaths(imagePaths: string[]) {
