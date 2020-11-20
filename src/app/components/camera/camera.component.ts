@@ -22,8 +22,6 @@ export class CameraComponent implements OnInit {
   @Input() srcList: { imgPath: string; base64: string }[] = [];
   @Input() picturesDirectory = 'AppPhotos';
  // @Input() saveLocation = '';
-
-  // @Output() PictureAddedEvent: EventEmitter<string> = new EventEmitter();
   @Output() emitImagePathsChange: EventEmitter<string[]> = new EventEmitter<string[]>();
 
   private panelExpand = false;
@@ -134,7 +132,7 @@ export class CameraComponent implements OnInit {
     return blob;
   }
 
-  // here is the method is used to write a file in storage
+  // method used to write a file in storage
   Base64ToFile(imgName, b64Str, pixDir): Promise<any> {
     const self = this;
     const dataBlob = this.b64toBlob(b64Str, null, null);
