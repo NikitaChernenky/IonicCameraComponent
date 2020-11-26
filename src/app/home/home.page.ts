@@ -16,12 +16,16 @@ export class HomePage implements OnInit{
   maxNumberOfImages = 10;
   itemLabel = 'Images';
   required = true;
-  saveCopyToGallery = false;
+  saveCopyToGallery = true;
   srcList: { imgPath: string; base64: string }[] = [];
   picturesDirectory = 'justPhotos';
 
-  croppedImagepath = '';
-  isLoading = false;
+  maxNumberOfImages2 = 10;
+  itemLabel2 = 'Images';
+  required2 = true;
+  saveCopyToGallery2 = false;
+  srcList2: { imgPath: string; base64: string }[] = [];
+  picturesDirectory2 = 'justPhotos2';
 
   image = '';
   base64Image = '';

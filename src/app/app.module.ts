@@ -1,6 +1,9 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
+import { WebView } from '@ionic-native/ionic-webview/ngx';
+import { FileHelper } from 'cordova-file-helper';
+
 
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
@@ -11,6 +14,7 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { Camera } from '@ionic-native/Camera/ngx';
 import { File } from '@ionic-native/file/ngx';
+import {base64ToFile} from 'ngx-image-cropper';
 
 @NgModule({
   declarations: [AppComponent],
@@ -20,7 +24,9 @@ import { File } from '@ionic-native/file/ngx';
     StatusBar,
     SplashScreen,
     File,
+    WebView,
     Camera,
+    FileHelper,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent]

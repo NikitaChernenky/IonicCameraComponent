@@ -55,7 +55,7 @@
               class="deleteIcon"
               (click)="deletePhoto(i)"
             ></ion-icon>
-            <img class="image" [src]="photo.base64" *ngIf="photo.base64" />
+            <img class="image" [src]="this.sanitizer.bypassSecurityTrustResourceUrl(photo.imgPath)"/>
           </ion-card>
         </ion-col>
       </ion-row>

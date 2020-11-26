@@ -23,8 +23,32 @@
             [picturesDirectory]="picturesDirectory"
             style="width: 100%"
           ></app-camera>
+
+          
         </ion-item>
       </ion-item-group>
     </ion-list>
   </div>
+
+  <div>
+    <ion-list lines="none">
+      <ion-item-group>
+        <ion-item class="ion-no-padding" style="--inner-padding-end: 0;">
+          <app-camera 
+            (emitImagePathsChange)="printImagePaths($event)"
+            [maxNumberOfImages]="maxNumberOfImages2"
+            [itemLabel]="itemLabel2"
+            [required]="required2"
+            [saveCopyToGallery]="saveCopyToGallery2"
+            [(srcList)]="srcList2"
+            [picturesDirectory]="picturesDirectory2"
+            style="width: 100%"
+          ></app-camera>
+
+          
+        </ion-item>
+      </ion-item-group>
+    </ion-list>
+  </div>
+  
 </ion-content>
