@@ -1,4 +1,3 @@
-import { WebView } from '@ionic-native/ionic-webview/ngx';
 import {
   Component,
   Output,
@@ -99,8 +98,8 @@ export class CameraComponent implements AfterViewInit {
               console.log('photos directory successfully created');
               this.folderPath = picturesDirectory.toInternalURL();
               console.log(this.folderPath);
-              const helper1 = new FileHelper(this.folderPath);
-              await helper1.waitInit();
+              this.helper = new FileHelper(this.folderPath);
+              await this.helper.waitInit();
               picturesDirectory.getFile(imgName, { create: true }, (file) => {
                 console.log('File created succesfully.');
                 file.createWriter(
@@ -110,22 +109,22 @@ export class CameraComponent implements AfterViewInit {
                     console.log('finsihed writing to file: ');
 
                     console.log('helper');
-                    console.log(helper1.ls());
+                    console.log(this.helper.ls());
                     // this.helper.cd(this.folderPath);
                     console.log('Helper 2');
-                    console.log(helper1.pwd());
+                    console.log(this.helper.pwd());
                     // this.tempImagePath = helper1.pwd();
                     // let convertedImagePath = this.tempImagePath;
                     console.log('test existence');
                     // console.log(this.tempImagePath);
-                    console.log(helper1.exists(this.picturesDirectory));
-                    helper1.cd(this.picturesDirectory);
+                    console.log(this.helper.exists(this.picturesDirectory));
+                    this.helper.cd(this.picturesDirectory);
                     console.log('in pics dir:');
-                    console.log(helper1.pwd());
-                    console.log(helper1.ls());
-                    console.log(helper1.stats(imgName));
+                    console.log(this.helper.pwd());
+                    console.log(this.helper.ls());
+                    console.log(this.helper.stats(imgName));
                     console.log('what Im trying to push: ');
-                    this.tempImagePath = await helper1.toInternalURL(imgName);
+                    this.tempImagePath = await this.helper.toInternalURL(imgName);
                     console.log(this.tempImagePath);
                     const imagePath = this.tempImagePath;
                     window.resolveLocalFileSystemURL(imagePath, async (entry) => {
