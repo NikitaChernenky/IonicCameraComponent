@@ -81,120 +81,66 @@ export class CameraComponent implements AfterViewInit {
         const base64ImageBlob: Blob = base64ToFile(base64Image);
         const dataDirectoryPath = cordova.file.dataDirectory;
         console.log('initial path: ' + dataDirectoryPath);
-        // const imageFile: File = new File([base64ImageBlob], imgName, {type: "image/jpeg"});
-        // this.file.createDir(cordova.file.dataDirectory, this.picturesDirectory, false).then(_ =>
-        //   console.log('Created a new directory')).catch(err =>
-        //  console.log('Could not create a new directory or the directory already exists'));
-        // console.log(saveDir);
 
-
-
-        window.resolveLocalFileSystemURL(dataDirectoryPath, (dir) => {
-          console.log('Access to the directory granted succesfully');
+        window.resolveLocalFileSystemURL(dataDirectoryPath, async (dir) => {
+          // console.log('Access to the directory granted succesfully');
           dir.getDirectory(
             this.picturesDirectory,
             { create: true },
             async (picturesDirectory) => {
-              console.log('photos directory successfully created');
+              // console.log('photos directory successfully created');
               this.folderPath = picturesDirectory.toInternalURL();
-              console.log(this.folderPath);
+              console.log('suka here');
               this.helper = new FileHelper(this.folderPath);
               await this.helper.waitInit();
-              picturesDirectory.getFile(imgName, { create: true }, (file) => {
-                console.log('File created succesfully.');
+              picturesDirectory.getFile(imgName, { create: true }, async (file) => { // create empty file imgName
+               // console.log('File created succesfully.');
                 file.createWriter(
                    async (fileWriter) => {
-                    console.log('Writing content to file');
-                    fileWriter.write(base64ImageBlob);
-                    console.log('finsihed writing to file: ');
+                    fileWriter.write(base64ImageBlob); // write blob into the file
 
-                    console.log('helper');
-                    console.log(this.helper.ls());
-                    // this.helper.cd(this.folderPath);
-                    console.log('Helper 2');
-                    console.log(this.helper.pwd());
-                    // this.tempImagePath = helper1.pwd();
-                    // let convertedImagePath = this.tempImagePath;
-                    console.log('test existence');
-                    // console.log(this.tempImagePath);
                     console.log(this.helper.exists(this.picturesDirectory));
-                    this.helper.cd(this.picturesDirectory);
-                    console.log('in pics dir:');
-                    console.log(this.helper.pwd());
-                    console.log(this.helper.ls());
-                    console.log(this.helper.stats(imgName));
-                    console.log('what Im trying to push: ');
-                    this.tempImagePath = await this.helper.toInternalURL(imgName);
-                    console.log(this.tempImagePath);
-                    const imagePath = this.tempImagePath;
-                    window.resolveLocalFileSystemURL(imagePath, async (entry) => {
-                      const nativeURL = entry.toURL();
-                      console.log('nativeURL: ');
-                      console.log(nativeURL);
-                      this.tempSchemeImagePath =  window['Ionic']['WebView'].convertFileSrc(nativeURL);
-                      console.log('new Path: ');
-                      console.log(this.tempSchemeImagePath);
 
-                      const newimagePath = await this.tempSchemeImagePath;
-                      console.log('What Im pushing: ');
-                      console.log(newimagePath);
-                      const imgRes = { imgPath: newimagePath, base64: base64Image };
-                      console.log(imgRes);
-                      this.srcList.push(imgRes);
-                      this.updateImagePath();
-                      console.log('src:');
-                      console.log(this.srcList);
-                    });
+                    console.log('in pics dir:');
+                     console.log(this.helper.pwd());
+                     console.log(this.helper.ls());
+                     console.log(this.helper.stats(imgName));
+                    console.log('what Im trying to push: ');
+
+                    this.tempSchemeImagePath = window.Ionic['WebView'].convertFileSrc(file.toURL());
+
+                    console.log('new Path: ');
+                    console.log(this.tempSchemeImagePath);
+
+                    const newimagePath = await this.tempSchemeImagePath;
+                    console.log('What Im pushing: ');
+                    console.log(newimagePath);
+                    const imgRes = { imgPath: newimagePath, base64: base64Image };
+                    console.log(imgRes);
+                    this.srcList.push(imgRes);
+                    this.updateImagePath();
+                    console.log('src:');
+                    console.log(this.srcList);
                   },
                   () => {
-                    alert('Unable to save file in path ' + this.folderPath);
+                    alert('Encountered error in FileWriter');
                   }
                 );
-              });
+              },
+              (onErrorCreateFile) => {
+                console.log('Encountered error when creating the imgFile');
+              }
+              );
             },
             (err) => {
               console.log('Encountered error when creating the pictures folder');
             }
           );
-        });
-
-        /*
-        window.resolveLocalFileSystemURL(cordova.file.dataDirectory, (dirEntry) => {
-          console.log('file system open: ' + dirEntry.name);
-          this.file.createFile(dirEntry, imgName, false);
-      }, console.log('Error suka'));
-      */
-
-        // const imagePath = await this.Base64ToFile(
-        //  imgName,
-        //   imageB64,
-        //   this.picturesDirectory
-        // );
-        // imagePath = this.sanitizer.bypassSecurityTrustResourceUrl(imagePath);
-        //     //  // const cdvfileUrl = imagePath.toString();
-        //   //   // console.log(cdvfileUrl);
-        // let newimagePath = window.WkWebView.convertFilePath(cdvfileUrl);
-        // console.log(newimagePath);
-        // let newimagePath = this.webView.convertFileSrc(cdvfileUrl);
-        // console.log(newimagePath);
-        /*
-        window.resolveLocalFileSystemURL(cdvfileUrl, function(entry) {
-          const nativeUrl = entry.toNativeURL(); // will be "file://...."
-
-          // Use nativeUrl to get scheme friendly url
-          this.imagePath = window.WkWebview.convertFilePath(nativeUrl);  // Will be "app://..."
-      });
-      */
-        /*
-        imagePath = window.resolveLocalFileSystemURL(cacheUrl, (entry: any) => {
-          cacheUrl = entry.toURL();
-          const ionicNormalizer = window.Ionic &&
-             ((window.Ionic.WebView && window.Ionic.WebView.convertFileSrc) || window.Ionic.normalizeURL);
-          if (typeof ionicNormalizer === "function") {
-              cacheUrl = ionicNormalizer(cacheUrl);
-          }
-        });
-        */
+        },
+            (err) => {
+              console.log('Encountered error when accessing dataDirectory path');
+            }
+        );
 
       } catch (ex) {
         console.log(ex);
@@ -227,25 +173,6 @@ export class CameraComponent implements AfterViewInit {
       }
     );
   }
-  /*
-   savefile(dataurl){
-    window.requestFileSystem(LocalFileSystem.PERSISTENT, 0,
-    function (fileSystem) {
-        fileSystem.root.getDirectory( cordova.file.dataDirectory, {create:true, exclusive: false},
-        function(directory) {
-            directory.root.getFile("image.jpg", {create: true, exclusive: false},
-            function (fileEntry) {
-                fileEntry.createWriter(function (writer) {
-                    console.log("Start creating image file");
-                    writer.seek(0);
-                    writer.write(dataurl);
-                    console.log("End creating image file. File created");
-                }, rejects);
-            }, rejects);
-        }, rejects);
-    }, rejects);
-}
-*/
 
   // Method I used to convert base64 data to blob data
   b64toBlob(b64Data: string, contentType: string, sliceSize: number) {
@@ -272,39 +199,7 @@ export class CameraComponent implements AfterViewInit {
     return blob;
   }
 
-  // method used to write a file in storage
-  Base64ToFile(imgName, b64Str, pixDir): Promise<any> {
-    const self = this;
-    const dataBlob = this.b64toBlob(b64Str, null, null);
-
-    return new Promise((resolve, reject) => {
-      // const path = cordova.file.applicationDirectory;
-      const path = cordova.file.dataDirectory;
-      window.resolveLocalFileSystemURL(
-        path,
-        (fileSys) => {
-          fileSys.filesystem.root.getDirectory(
-            pixDir,
-            { create: true },
-            (directory) => {
-              directory.getFile(imgName, { create: true }, (file) => {
-                file.createWriter((fileWriter) => {
-                  fileWriter.onwrite = () => {
-                    resolve(file.toInternalURL());
-                  };
-
-                  fileWriter.onerror = reject;
-                  fileWriter.write(dataBlob);
-                }, reject);
-              });
-            },
-            reject
-          );
-        },
-        reject
-      );
-    });
-  }
+  // method used to write a file in storage Base64ToFile
 
   public showErrorMessage(Error: string): void {
     console.log(Error);
