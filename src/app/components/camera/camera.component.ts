@@ -153,7 +153,7 @@ export class CameraComponent implements AfterViewInit {
               });
             },
             (err) => {
-              console.log('sucked at creating the photos folder');
+              console.log('Encountered error when creating the pictures folder');
             }
           );
         });
