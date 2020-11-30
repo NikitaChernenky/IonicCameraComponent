@@ -23,7 +23,7 @@ declare let cordova: any;
   templateUrl: './camera.component.html',
   styleUrls: ['./camera.component.scss'],
 })
-export class CameraComponent implements AfterViewInit {
+export class CameraComponent implements OnInit, AfterViewInit {
   @Input() maxNumberOfImages = 10;
   @Input() itemLabel = 'Images';
   @Input() required = false;
@@ -42,6 +42,7 @@ export class CameraComponent implements AfterViewInit {
   private tempImagePath: any;
   private tempSchemeImagePath: any;
   private folderPath: string;
+  private waitedToLoad = true;
 
   imagePaths = [];
 
@@ -245,9 +246,11 @@ export class CameraComponent implements AfterViewInit {
     console.log('in update imgpath');
     this.imagePaths = []; // reset array
     for (let i = 0; i < this.srcList.length; i++) {
-      setTimeout(
+      setTimeout( // wait 0.5 seconds to make sure that the link sanitizes before loading the image
         () => {this.imagePaths[i] = this.sanitizer.bypassSecurityTrustResourceUrl(this.srcList[i].imgPath); } , 100
       );
+
+      this.imagePaths[i] = (this.srcList[i].imgPath);
     }
     console.log('now let us see the strange array we want');
     console.log(this.imagePaths);
@@ -258,4 +261,5 @@ export class CameraComponent implements AfterViewInit {
     console.log('emitting ^_^');
     this.emitImagePathsChange.emit(this.imagePaths);
   }
+
 }
