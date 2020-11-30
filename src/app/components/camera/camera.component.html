@@ -48,14 +48,14 @@
   >
     <ion-grid>
       <ion-row no-padding>
-        <ion-col *ngFor="let photo of srcList; let i = index">
+        <ion-col *ngFor="let photo of imagePaths; let i = index">
           <ion-card class="block">
             <ion-icon
               name="trash"
               class="deleteIcon"
               (click)="deletePhoto(i)"
             ></ion-icon>
-            <img class="image" [src]="this.sanitizer.bypassSecurityTrustResourceUrl(photo.imgPath)"/>
+            <img class="image" [src]="photo"/>
           </ion-card>
         </ion-col>
       </ion-row>

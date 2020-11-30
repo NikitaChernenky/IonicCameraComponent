@@ -4,6 +4,7 @@ import {
   Input,
   EventEmitter,
   AfterViewInit,
+  OnInit
 } from '@angular/core';
 import { Camera, CameraOptions } from '@ionic-native/Camera/ngx';
 import { AlertController } from '@ionic/angular';
@@ -42,7 +43,7 @@ export class CameraComponent implements AfterViewInit {
   private tempSchemeImagePath: any;
   private folderPath: string;
 
-  imagePaths: string[] = [];
+  imagePaths = [];
 
   constructor(
     private camera: Camera,
@@ -61,6 +62,12 @@ export class CameraComponent implements AfterViewInit {
       this.togglePanel();
     }
   }
+
+  ngOnInit() {
+    this.updateImagePath();
+    // for (let i = 0; i < this.srcList.length; i++) {
+     // this.srcList
+    }
 
   pickImage(sourceType) {
     const options: CameraOptions = {
@@ -81,66 +88,20 @@ export class CameraComponent implements AfterViewInit {
         const base64ImageBlob: Blob = base64ToFile(base64Image);
         const dataDirectoryPath = cordova.file.dataDirectory;
         console.log('initial path: ' + dataDirectoryPath);
+        const imagePath = await this.saveBase64File(imgName, base64ImageBlob, dataDirectoryPath);
 
-        window.resolveLocalFileSystemURL(dataDirectoryPath, async (dir) => {
-          // console.log('Access to the directory granted succesfully');
-          dir.getDirectory(
-            this.picturesDirectory,
-            { create: true },
-            async (picturesDirectory) => {
-              // console.log('photos directory successfully created');
-              this.folderPath = picturesDirectory.toInternalURL();
-              console.log('suka here');
-              this.helper = new FileHelper(this.folderPath);
-              await this.helper.waitInit();
-              picturesDirectory.getFile(imgName, { create: true }, async (file) => { // create empty file imgName
-               // console.log('File created succesfully.');
-                file.createWriter(
-                   async (fileWriter) => {
-                    fileWriter.write(base64ImageBlob); // write blob into the file
+        // const newimagePath = await this.tempSchemeImagePath;
+        console.log('What Im pushing: ');
+        console.log(imagePath);
+        const imgRes = { imgPath: imagePath, base64: base64Image };
+        console.log(imgRes);
+        this.srcList.push(imgRes);
+        console.log('pushed');
+        console.log(this.srcList);
+        this.updateImagePath();
+        console.log('src:');
+        console.log(this.srcList);
 
-                    console.log(this.helper.exists(this.picturesDirectory));
-
-                    console.log('in pics dir:');
-                     console.log(this.helper.pwd());
-                     console.log(this.helper.ls());
-                     console.log(this.helper.stats(imgName));
-                    console.log('what Im trying to push: ');
-
-                    this.tempSchemeImagePath = window.Ionic['WebView'].convertFileSrc(file.toURL());
-
-                    console.log('new Path: ');
-                    console.log(this.tempSchemeImagePath);
-
-                    const newimagePath = await this.tempSchemeImagePath;
-                    console.log('What Im pushing: ');
-                    console.log(newimagePath);
-                    const imgRes = { imgPath: newimagePath, base64: base64Image };
-                    console.log(imgRes);
-                    this.srcList.push(imgRes);
-                    this.updateImagePath();
-                    console.log('src:');
-                    console.log(this.srcList);
-                  },
-                  () => {
-                    alert('Encountered error in FileWriter');
-                  }
-                );
-              },
-              (onErrorCreateFile) => {
-                console.log('Encountered error when creating the imgFile');
-              }
-              );
-            },
-            (err) => {
-              console.log('Encountered error when creating the pictures folder');
-            }
-          );
-        },
-            (err) => {
-              console.log('Encountered error when accessing dataDirectory path');
-            }
-        );
 
       } catch (ex) {
         console.log(ex);
@@ -201,6 +162,58 @@ export class CameraComponent implements AfterViewInit {
 
   // method used to write a file in storage Base64ToFile
 
+   saveBase64File(imgName, b64ImageBlob, dataDirectory): Promise<any> {
+    return new Promise((resolve, reject) => {
+    window.resolveLocalFileSystemURL(dataDirectory, (dir) => {
+      // console.log('Access to the directory granted succesfully');
+      dir.getDirectory(
+        this.picturesDirectory,
+        { create: true },
+         (picturesDirectory) => {
+          // console.log('photos directory successfully created');
+          this.folderPath = picturesDirectory.toInternalURL();
+          console.log('in pictures directory');
+          // this.helper = new FileHelper(this.folderPath);
+          // await this.helper.waitInit();
+          picturesDirectory.getFile(imgName, { create: true }, (file) => { // create empty file imgName
+           // console.log('File created succesfully.');
+            file.createWriter(
+                (fileWriter) => {
+                fileWriter.write(b64ImageBlob); // write blob into the file
+
+                // console.log(this.helper.exists(this.picturesDirectory));
+
+                // console.log('in pics dir:');
+                // console.log(this.helper.pwd());
+                // console.log(this.helper.ls());
+                // console.log(this.helper.stats(imgName));
+                console.log('what Im trying to push: ');
+                this.tempSchemeImagePath = window.Ionic.WebView.convertFileSrc(file.toURL());
+                console.log(this.tempSchemeImagePath);
+                resolve(this.tempSchemeImagePath);
+              },
+              () => {
+                alert('Encountered error in FileWriter');
+              }
+            );
+          },
+          (onErrorCreateFile) => {
+            reject('Encountered error when creating the imgFile');
+          }
+          );
+        },
+        (err) => {
+          reject('Encountered error when creating the pictures folder');
+        }
+      );
+    },
+        (err) => {
+          reject('Encountered error when accessing dataDirectory path');
+        }
+    );
+  });
+}
+
   public showErrorMessage(Error: string): void {
     console.log(Error);
     this.alertCtrl
@@ -229,14 +242,20 @@ export class CameraComponent implements AfterViewInit {
   }
 
   updateImagePath() {
+    console.log('in update imgpath');
     this.imagePaths = []; // reset array
     for (let i = 0; i < this.srcList.length; i++) {
-      this.imagePaths[i] = this.srcList[i].imgPath.toString();
+      setTimeout(
+        () => {this.imagePaths[i] = this.sanitizer.bypassSecurityTrustResourceUrl(this.srcList[i].imgPath); } , 100
+      );
     }
-    this.emitImagePaths(this.imagePaths);
+    console.log('now let us see the strange array we want');
+    console.log(this.imagePaths);
+    this.emitImagePaths();
   }
 
-  emitImagePaths(imagePaths: string[]) {
-    this.emitImagePathsChange.emit(imagePaths);
+  emitImagePaths() {
+    console.log('emitting ^_^');
+    this.emitImagePathsChange.emit(this.imagePaths);
   }
 }
