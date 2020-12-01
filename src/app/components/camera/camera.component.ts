@@ -23,9 +23,7 @@ export class CameraComponent implements OnInit, AfterViewInit {
   @Input() srcList: { imgPath: string; base64: string }[] = [];
   @Input() picturesDirectory = 'AppPhotos';
   @Input() saveLocation = '';
-  @Output() emitImagePathsChange: EventEmitter<string[]> = new EventEmitter<
-    string[]
-  >();
+  @Output() emitImagePathsChange: EventEmitter<string[]> = new EventEmitter<string[]>();
 
   private panelExpand = false;
   private iconClicked = false;
