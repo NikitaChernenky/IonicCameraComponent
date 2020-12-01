@@ -1,11 +1,4 @@
-import {
-  Component,
-  Output,
-  Input,
-  EventEmitter,
-  AfterViewInit,
-  OnInit
-} from '@angular/core';
+import {Component, Output, Input, EventEmitter, AfterViewInit, OnInit} from '@angular/core';
 import { Camera, CameraOptions } from '@ionic-native/Camera/ngx';
 import { AlertController } from '@ionic/angular';
 import { File } from '@ionic-native/file/ngx';
@@ -31,9 +24,7 @@ export class CameraComponent implements OnInit, AfterViewInit {
   @Input() srcList: { imgPath: string; base64: string }[] = [];
   @Input() picturesDirectory = 'AppPhotos';
   @Input() saveLocation = '';
-  @Output() emitImagePathsChange: EventEmitter<string[]> = new EventEmitter<
-    string[]
-  >();
+  @Output() emitImagePathsChange: EventEmitter<string[]> = new EventEmitter<string[]>();
 
   private panelExpand = false;
   private iconClicked = false;
@@ -65,9 +56,7 @@ export class CameraComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    this.updateImagePath();
-    // for (let i = 0; i < this.srcList.length; i++) {
-     // this.srcList
+    this.initializeImagePaths();
     }
 
   pickImage(sourceType) {
@@ -90,20 +79,7 @@ export class CameraComponent implements OnInit, AfterViewInit {
         const dataDirectoryPath = cordova.file.dataDirectory;
         console.log('initial path: ' + dataDirectoryPath);
         const imagePath = await this.saveBase64File(imgName, base64ImageBlob, dataDirectoryPath);
-
-        // const newimagePath = await this.tempSchemeImagePath;
-        console.log('What Im pushing: ');
-        console.log(imagePath);
-        const imgRes = { imgPath: imagePath, base64: base64Image };
-        console.log(imgRes);
-        this.srcList.push(imgRes);
-        console.log('pushed');
-        console.log(this.srcList);
-        this.updateImagePath();
-        console.log('src:');
-        console.log(this.srcList);
-
-
+        this.appendPhoto(imagePath, base64Image);
       } catch (ex) {
         console.log(ex);
         this.showErrorMessage(ex);
@@ -136,33 +112,6 @@ export class CameraComponent implements OnInit, AfterViewInit {
     );
   }
 
-  // Method I used to convert base64 data to blob data
-  b64toBlob(b64Data: string, contentType: string, sliceSize: number) {
-    contentType = contentType || '';
-    sliceSize = sliceSize || 512;
-
-    const byteCharacters = atob(b64Data);
-    const byteArrays = [];
-
-    for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-      const slice = byteCharacters.slice(offset, offset + sliceSize);
-
-      const byteNumbers = new Array(slice.length);
-      for (let i = 0; i < slice.length; i++) {
-        byteNumbers[i] = slice.charCodeAt(i);
-      }
-
-      const byteArray = new Uint8Array(byteNumbers);
-
-      byteArrays.push(byteArray);
-    }
-
-    const blob = new Blob(byteArrays, { type: contentType });
-    return blob;
-  }
-
-  // method used to write a file in storage Base64ToFile
-
    saveBase64File(imgName, b64ImageBlob, dataDirectory): Promise<any> {
     return new Promise((resolve, reject) => {
     window.resolveLocalFileSystemURL(dataDirectory, (dir) => {
@@ -189,7 +138,7 @@ export class CameraComponent implements OnInit, AfterViewInit {
                 // console.log(this.helper.ls());
                 // console.log(this.helper.stats(imgName));
                 console.log('what Im trying to push: ');
-                this.tempSchemeImagePath = window.Ionic.WebView.convertFileSrc(file.toURL());
+                this.tempSchemeImagePath = window.Ionic['WebView'].convertFileSrc(file.toURL());
                 console.log(this.tempSchemeImagePath);
                 resolve(this.tempSchemeImagePath);
               },
@@ -237,29 +186,46 @@ export class CameraComponent implements OnInit, AfterViewInit {
     this.panelExpand = !this.panelExpand;
   }
 
-  deletePhoto(index) {
-    this.srcList.splice(index, 1);
-    this.updateImagePath();
+  emitImagePaths() {
+    console.log('emitting ^_^');
+    this.emitImagePathsChange.emit(this.imagePaths);
   }
 
-  updateImagePath() {
-    console.log('in update imgpath');
-    this.imagePaths = []; // reset array
-    for (let i = 0; i < this.srcList.length; i++) {
-      setTimeout( // wait 0.5 seconds to make sure that the link sanitizes before loading the image
-        () => {this.imagePaths[i] = this.sanitizer.bypassSecurityTrustResourceUrl(this.srcList[i].imgPath); } , 100
-      );
+  async sanitizeURL(originalURL: string) { // await for the link to sanitize before the image is image
+    return new Promise((resolve, reject) => {
+      window.setTimeout( () => {
+        resolve(this.sanitizer.bypassSecurityTrustResourceUrl(originalURL));
+      }, 300);
+    });
+ }
 
-      this.imagePaths[i] = (this.srcList[i].imgPath);
+  async initializeImagePaths() {
+    for (let i = 0; i < this.srcList.length; i++) {
+      this.imagePaths[i] = await this.sanitizeURL(this.srcList[i].imgPath);
     }
-    console.log('now let us see the strange array we want');
+    this.emitImagePaths();
+  }
+
+  async appendPhoto(imagePath: string, base64Image: string) {
+    console.log('What Im pushing: ');
+    console.log(imagePath);
+    const imgRes = { imgPath: imagePath, base64: base64Image };
+    console.log(imgRes);
+    this.srcList.push(imgRes);
+    const sanitizedURL = await this.sanitizeURL(imagePath);
+    this.imagePaths.push(sanitizedURL);
+    console.log('pushed');
+    console.log('srcList');
+    console.log(this.srcList);
+    console.log('imgPath array');
     console.log(this.imagePaths);
     this.emitImagePaths();
   }
 
-  emitImagePaths() {
-    console.log('emitting ^_^');
-    this.emitImagePathsChange.emit(this.imagePaths);
+  deletePhoto(index) {
+    this.srcList.splice(index, 1);
+    this.imagePaths.splice(index, 1);
+    this.emitImagePaths();
   }
 
 }
