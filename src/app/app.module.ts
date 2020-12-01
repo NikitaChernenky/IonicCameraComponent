@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
-import { WebView } from '@ionic-native/ionic-webview/ngx';
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
@@ -19,7 +18,6 @@ import { File } from '@ionic-native/file/ngx';
     StatusBar,
     SplashScreen,
     File,
-    WebView,
     Camera,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
