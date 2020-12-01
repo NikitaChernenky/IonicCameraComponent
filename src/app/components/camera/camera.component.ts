@@ -125,14 +125,11 @@ export class CameraComponent implements OnInit, AfterViewInit {
                   file.createWriter(
                     (fileWriter) => {
                       fileWriter.write(b64ImageBlob); // write blob into the file
-
-                      console.log('what Im trying to push: ');
                       this.tempSchemeImagePath = window.Ionic['WebView'].convertFileSrc(file.toURL());
-                      console.log(this.tempSchemeImagePath);
                       resolve(this.tempSchemeImagePath);
                     },
-                    () => {
-                      alert('Encountered error in FileWriter');
+                    (err) => {
+                      reject('Encountered error in FileWriter');
                     }
                   );
                 },
@@ -176,14 +173,12 @@ export class CameraComponent implements OnInit, AfterViewInit {
   }
 
   emitImagePaths() {
-    console.log('emitting ^_^');
     this.emitImagePathsChange.emit(this.imagePaths);
   }
 
   async sanitizeURL(originalURL: string) {
-    // await for the link to sanitize before the image is image
     return new Promise((resolve, reject) => {
-      window.setTimeout(() => {
+      window.setTimeout(() => { // await for the link to sanitize before the image is loaded
         resolve(this.sanitizer.bypassSecurityTrustResourceUrl(originalURL));
       }, 300);
     });
@@ -197,18 +192,10 @@ export class CameraComponent implements OnInit, AfterViewInit {
   }
 
   async appendPhoto(imagePath: string, base64Image: string) {
-    console.log('What Im pushing: ');
-    console.log(imagePath);
     const imgRes = { imgPath: imagePath, base64: base64Image };
-    console.log(imgRes);
     this.srcList.push(imgRes);
     const sanitizedURL = await this.sanitizeURL(imagePath);
     this.imagePaths.push(sanitizedURL);
-    console.log('pushed');
-    console.log('srcList');
-    console.log(this.srcList);
-    console.log('imgPath array');
-    console.log(this.imagePaths);
     this.emitImagePaths();
   }
 
